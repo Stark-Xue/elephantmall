@@ -10,11 +10,14 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
-import os
+import os, sys
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
+print(BASE_DIR)
+sys.path.append(os.path.join(BASE_DIR, 'apps'))
+print(sys.path)
+print(os.path.join(BASE_DIR, 'jinja_templates'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
@@ -31,12 +34,18 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
+    # 'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'areas.apps.AreasConfig',
+    'users.apps.UsersConfig',
+    'verifications.apps.VerificationsConfig',
+    'contents.apps.ContentsConfig',
+    'carts.apps.CartsConfig',
+    'goods.apps.GoodsConfig',
 ]
 
 MIDDLEWARE = [
@@ -54,23 +63,10 @@ ROOT_URLCONF = 'elephantmall.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.jinja2.Jinja2',
-        'DIRS': [os.path.join(BASE_DIR, 'templates'), ],
+        'DIRS': [os.path.join(BASE_DIR, 'jinja_templates'), ],
         'APP_DIRS': True,
         'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-            ],
             'environment':'elephantmall.utils.jinja2_env.jinja2_environment',
-        },
-
-
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
-        'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
@@ -78,6 +74,19 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
             ],
         },
+
+
+        # 'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        # 'DIRS': [],
+        # 'APP_DIRS': False,
+        # 'OPTIONS': {
+        #     'context_processors': [
+        #         'django.template.context_processors.debug',
+        #         'django.template.context_processors.request',
+        #         'django.contrib.auth.context_processors.auth',
+        #         'django.contrib.messages.context_processors.messages',
+        #     ],
+        # },
     },
 ]
 
@@ -157,6 +166,20 @@ CACHES = {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
     },
+    "image_code": {  # image_code
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/2",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    },
+    "sms_code": {  # sms_code
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/3",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    },
 }
 
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
@@ -203,3 +226,25 @@ LOGGING = {
         },
     }
 }
+
+# 用户认证
+AUTH_USER_MODEL = "users.User"
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'users.utils.MobileModelBackend',
+]
+
+
+LOGIN_URL = '/login/'   #登陆认证不成功跳转地址
+
+
+# EMAIL 发邮件服务器的配置
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'  # 指定邮件后端
+EMAIL_HOST = 'smtp.qq.com'  # 发邮件主机
+EMAIL_PORT = 25  # 发邮件端口
+EMAIL_HOST_USER = '1595627859@qq.com'  # 授权的邮箱
+EMAIL_HOST_PASSWORD = 'zonphajjlqupijgb'  # 邮箱授权时设置或者获取的授权码，非注册登录密码
+EMAIL_FROM = '大象商城<1595627859@qq.com>'  # 发件人抬头
+
+EMAIL_VERIFY_URL = 'http://mall.woniuxy.com:8000/emails/verification/'

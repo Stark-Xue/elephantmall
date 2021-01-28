@@ -38,6 +38,7 @@ var vm = new Vue({
         this.addresses = JSON.parse(JSON.stringify(addresses));
         // 默认地址id
         this.default_address_id = default_address_id;
+
     },
     watch: {
         // 监听到省份id变化
@@ -86,19 +87,27 @@ var vm = new Vue({
     methods: {
         // 获取省份数据
         get_provinces(){
+            console.log("hots:"+this.host);
             var url = this.host + '/areas/';
+            console.log(url);
             axios.get(url, {
                 responseType: 'json'
             })
                 .then(response => {
+                    console.log(response);
+                    console.log("wozaizheli");
                     if (response.data.code == '0') {
+                        console.log("haha1");
                         this.provinces = response.data.province_list;
                     } else {
+                        console.log("haha2");
+
                         console.log(response.data);
                         this.provinces = [];
                     }
                 })
                 .catch(error => {
+                    console.log("haha3");
                     console.log(error.response);
                     this.provinces = [];
                 });
